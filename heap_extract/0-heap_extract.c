@@ -1,117 +1,100 @@
 #include "binary_trees.h"
-#include <stdlib.h>
 
 /**
- * tree_height - Measures the height of a binary tree
- * Return: Height or 0 if tree is NULL
- */
-size_t tree_height(const binary_tree_t *tree)
-{
-    size_t l, r;
-
-    if (!tree)
-        return (0);
-
-    l = tree_height(tree->left);
-    r = tree_height(tree->right);
-    return (1 + (l > r ? l : r));
-}
-
-/**
- * tree_size - Measures the size (number of nodes) in a binary tree
- */
-size_t tree_size(const binary_tree_t *tree)
-{
-    if (!tree)
-        return (0);
-    return (1 + tree_size(tree->left) + tree_size(tree->right));
-}
-
-/**
- * get_last_node - Retrieves the last node in level-order traversal
- */
-heap_t *get_last_node(heap_t *root, size_t idx, size_t size)
-{
-    heap_t *left, *right;
-
-    if (!root)
-        return (NULL);
-    if (idx == size)
-        return (root);
-
-    left = get_last_node(root->left, 2 * idx + 1, size);
-    if (left)
-        return (left);
-
-    right = get_last_node(root->right, 2 * idx + 2, size);
-    return (right);
-}
-
-/**
- * heapify_down - Restores max-heap property starting from a given node
- */
-void heapify_down(heap_t *root)
-{
-    heap_t *largest;
-    int tmp;
-
-    while (root)
-    {
-        largest = root;
-
-        if (root->left && root->left->n > largest->n)
-            largest = root->left;
-        if (root->right && root->right->n > largest->n)
-            largest = root->right;
-
-        if (largest == root)
-            break;
-
-        tmp = root->n;
-        root->n = largest->n;
-        largest->n = tmp;
-        root = largest;
-    }
-}
-
-/**
- * heap_extract - Extracts the root node from a Max Binary Heap
+ * heap_extract - Extracts the root value from a max binary heap.
+ * @root: Double pointer to the root of the heap.
+ *
+ * Return: The value stored in the root node, or 0 if the function fails.
  */
 int heap_extract(heap_t **root)
 {
-    heap_t *last, *parent;
-    int value;
-    size_t size;
+	int extracted_value;
+	heap_t *last, *parent = NULL;
 
-    if (!root || !*root)
-        return (0);
+	if (!root || !(*root))
+		return (0);
 
-    value = (*root)->n;
+	extracted_value = (*root)->n;
 
-    if (!(*root)->left && !(*root)->right)
-    {
-        free(*root);
-        *root = NULL;
-        return (value);
-    }
+	last = get_last_node(*root);
+	if (last == *root)
+	{
+		free(*root);
+		*root = NULL;
+		return (extracted_value);
+	}
 
-    size = tree_size(*root);
-    last = get_last_node(*root, 0, size - 1);
+	(*root)->n = last->n;
 
-    if (last == NULL)
-        return (0);
+	parent = last->parent;
+	if (parent->left == last)
+		parent->left = NULL;
+	else
+		parent->right = NULL;
 
-    // Replace root value with last node value
-    (*root)->n = last->n;
+	free(last);
 
-    parent = last->parent;
-    if (parent->right == last)
-        parent->right = NULL;
-    else
-        parent->left = NULL;
+	sift_down(*root);
 
-    free(last);
-    heapify_down(*root);
+	return (extracted_value);
+}
 
-    return (value);
+/**
+ * get_last_node - Finds the last node in the level order of the heap.
+ * @root: Pointer to the root of the heap.
+ *
+ * Return: A pointer to the last node.
+ */
+heap_t *get_last_node(heap_t *root)
+{
+	heap_t **queue;
+	size_t front = 0, rear = 0, size = 1024;
+	heap_t *last = NULL;
+
+	queue = malloc(sizeof(heap_t *) * size);
+	if (!queue)
+		return (NULL);
+
+	queue[rear++] = root;
+
+	while (front < rear)
+	{
+		last = queue[front++];
+
+		if (last->left)
+			queue[rear++] = last->left;
+		if (last->right)
+			queue[rear++] = last->right;
+	}
+
+	free(queue);
+	return (last);
+}
+
+/**
+ * sift_down - Rebuilds the heap property by sifting down the node.
+ * @node: The node to sift down.
+ */
+void sift_down(heap_t *node)
+{
+	heap_t *largest;
+	int temp;
+
+	while (node)
+	{
+		largest = node;
+		if (node->left && node->left->n > largest->n)
+			largest = node->left;
+		if (node->right && node->right->n > largest->n)
+			largest = node->right;
+
+		if (largest == node)
+			return;
+
+		temp = node->n;
+		node->n = largest->n;
+		largest->n = temp;
+
+		node = largest;
+	}
 }
