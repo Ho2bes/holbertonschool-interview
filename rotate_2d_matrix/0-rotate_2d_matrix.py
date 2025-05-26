@@ -1,5 +1,15 @@
+#!/usr/bin/python3
+"""
+This module contains a function to rotate a 2D matrix 90 degrees clockwise.
+"""
+
 def rotate_2d_matrix(matrix):
-    """Rotate a 2D matrix 90 degrees clockwise in-place."""
+    """
+    Rotate a 2D matrix 90 degrees clockwise in-place.
+
+    Args:
+        matrix (list): a 2D list of integers (square matrix)
+    """
     n = len(matrix)
 
     # Step 1: Transpose the matrix
