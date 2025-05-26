@@ -39,7 +39,7 @@ void print_error(void)
 int main(int argc, char *argv[])
 {
     char *num1, *num2;
-    int len1, len2, i, j, *result, carry, n1, n2, sum, start;
+    int len1, len2, i, j, *result, carry, n1, n2, start;
 
     if (argc != 3 || !is_digit(argv[1]) || !is_digit(argv[2]))
         print_error();
