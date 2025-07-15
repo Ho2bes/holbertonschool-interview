@@ -1,23 +1,31 @@
+#!/usr/bin/python3
+"""
+Module to calculate the perimeter of an island described in a grid.
+"""
+
 def island_perimeter(grid):
-    if not grid:
-        return 0
+    """
+    Returns the perimeter of the island described in grid.
 
-    rows = len(grid)
-    cols = len(grid[0])
+    Args:
+        grid (List[List[int]]): 2D list representing the map.
+
+    Returns:
+        int: perimeter of the island
+    """
     perimeter = 0
+    rows = len(grid)
+    cols = len(grid[0]) if rows > 0 else 0
 
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] == 1:
-                # Start with 4 sides
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 1:
                 perimeter += 4
-
-                # Subtract sides shared with land above
-                if r > 0 and grid[r - 1][c] == 1:
-                    perimeter -= 2  # one for current and one for neighbor
-
-                # Subtract sides shared with land to the left
-                if c > 0 and grid[r][c - 1] == 1:
+                # Check top neighbor
+                if i > 0 and grid[i - 1][j] == 1:
+                    perimeter -= 2
+                # Check left neighbor
+                if j > 0 and grid[i][j - 1] == 1:
                     perimeter -= 2
 
     return perimeter
